@@ -7,34 +7,41 @@ using namespace std;
 class Enemy
 {
 public:
-	void charge();
+	void charge(int targetX, int targetY);
 protected:
-	int HP;
-	int damage;
-	int speed;
-	SDL_Rect shape;
+	int resistance; //ì  ìœ í˜•ì— ë”°ë¥¸ ë°€ë¦¼ì €í•­
+	int damage; //ì ì´ í”Œë ˆì´ì–´ì—ê²Œ ê³µê²©í–ˆì„ë•Œ ì£¼ëŠ” ë°ë¯¸ì§€ê°’
+	int speed; //ì ì˜ ì´ë™ì†ë„
+	SDL_Rect shape; //ì ì˜ ëª¨ì–‘
 };
-//»şÇÁ
+//ì—°í•„
+class Pencil : public Enemy
+{
+public:
+	Pencil();
+private:
+};
+//ìƒ¤í”„
 class Sharp : public Enemy
 {
 public:
 	Sharp();
 private:
 };
-//¸¸³âÇÊ
+//ë§Œë…„í•„
 class Fountain : public Enemy
 {
 public:
 	Fountain();
 private:
-	//¸¸³âÇÊ À×Å©ÀÚ±¹ÀÇ ÁÂÇ¥
+	//ë§Œë…„í•„ ì‰í¬ìêµ­ì˜ ì¢Œí‘œ
 	int track[5][2];
 };
-//ÄÄÆÛ½º
+//ì»´í¼ìŠ¤
 class Compass : public Enemy
 {
 public:
-	//ÄÄÆÛ½º¿ë µ¹Áø ÇÔ¼ö µû·Î ±¸Çö
+	//ì»´í¼ìŠ¤ìš© ëŒì§„ í•¨ìˆ˜ ë”°ë¡œ êµ¬í˜„
 	void charge();
 	Compass();
 private:
