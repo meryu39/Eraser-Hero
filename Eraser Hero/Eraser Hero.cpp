@@ -1,6 +1,7 @@
 ﻿#include <SDL.h>
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
