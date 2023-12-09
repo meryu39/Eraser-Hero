@@ -16,9 +16,9 @@ Enemy::~Enemy()
 
 void Enemy::charge(int targetX, int targetY)
 {
-		// ¸ñÇ¥ À§Ä¡±îÁö µµ´ŞÇß´ÂÁö È®ÀÎ
+		// ëª©í‘œ ìœ„ì¹˜ê¹Œì§€ ë„ë‹¬í–ˆëŠ”ì§€ í™•ì¸
 		if (this->x != targetX || this->y != targetY) {
-			// x ÁÂÇ¥·Î µµ´Ş
+			// x ì¢Œí‘œë¡œ ë„ë‹¬
 			if (this->x < targetX) {
 				this->x += this->speed;
 			}
@@ -26,7 +26,7 @@ void Enemy::charge(int targetX, int targetY)
 				this->x -= this->speed;
 			}
 
-			// y ÁÂÇ¥·Î µµ´Ş
+			// y ì¢Œí‘œë¡œ ë„ë‹¬
 			if (this->y < targetY) {
 				this->y += this->speed;
 			}
@@ -85,7 +85,7 @@ void Enemy::render(SDL_Renderer* renderer) {
 SDL_Texture* Enemy::loadTexture(const char* path, SDL_Renderer* renderer) {
 	SDL_Surface* surface = IMG_Load(path);
 	if (!surface) {
-		cerr << "ÀÌ¹ÌÁö¸¦ ·ÎµåÇÏ´Âµ¥ ½ÇÆĞÇß½À´Ï´Ù: " << IMG_GetError() << endl;
+		cerr << "ì´ë¯¸ì§€ë¥¼ ë¡œë“œí•˜ëŠ”ë° ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤: " << IMG_GetError() << endl;
 		return nullptr;
 	}
 
@@ -95,15 +95,15 @@ SDL_Texture* Enemy::loadTexture(const char* path, SDL_Renderer* renderer) {
 	return texture;
 }
 
-bool Enemy::checkCollision(Player& other) //Ãæµ¹ ´ë»óÀº ÇÃ·¹ÀÌ¾î·Î ÇÑÁ¤ , ¾ÆÁ÷ ÇÃ·¹ÀÌ¾î Å¬·¡½º ±¸ÇöÀüÀÌ¶ó ¿À·ù°¡ ÀÌºüÀÌ... ¤¾¤¾;;;
+bool Enemy::checkCollision(Player& other) //ì¶©ëŒ ëŒ€ìƒì€ í”Œë ˆì´ì–´ë¡œ í•œì • , ì•„ì§ í”Œë ˆì´ì–´ í´ë˜ìŠ¤ êµ¬í˜„ì „ì´ë¼ ì˜¤ë¥˜ê°€ ì´ë¹ ì´... ã…ã…;;;
 {
-	// ÇöÀç ¿ÀºêÁ§Æ®ÀÇ °æ°è »óÀÚ
+	// í˜„ì¬ ì˜¤ë¸Œì íŠ¸ì˜ ê²½ê³„ ìƒì
 	SDL_Rect rect1 = { x, y, width, height };
 
-	// ´Ù¸¥ ¿ÀºêÁ§Æ®ÀÇ °æ°è »óÀÚ
+	// ë‹¤ë¥¸ ì˜¤ë¸Œì íŠ¸ì˜ ê²½ê³„ ìƒì
 	SDL_Rect rect2 = { other.x, other.y, other.width, other.height };
 
-	// Ãæµ¹ ¿©ºÎ¸¦ SDLÀÇ ÇÔ¼ö¸¦ »ç¿ëÇÏ¿© È®ÀÎ
+	// ì¶©ëŒ ì—¬ë¶€ë¥¼ SDLì˜ í•¨ìˆ˜ë¥¼ ì‚¬ìš©í•˜ì—¬ í™•ì¸
 	return SDL_HasIntersection(&rect1, &rect2) == SDL_TRUE;
 }
 
@@ -154,15 +154,15 @@ Fountain::Fountain(SDL_Renderer* renderer, int spwanX, int spwanY)
 
 
 void Fountain::loadTrailTexture(SDL_Renderer* renderer) {
-	trailTexture = loadTexture("!ÀåÆÇÀÌ¹ÌÁö °æ·Î!", renderer);
+	trailTexture = loadTexture("!ì¥íŒì´ë¯¸ì§€ ê²½ë¡œ!", renderer);
 	if (!trailTexture) {
-		cerr << "ÀÚ±¹ ÀÌ¹ÌÁö¸¦ ·ÎµåÇÏ´Âµ¥ ½ÇÆĞÇß½À´Ï´Ù." << endl;
+		cerr << "ìêµ­ ì´ë¯¸ì§€ë¥¼ ë¡œë“œí•˜ëŠ”ë° ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤." << endl;
 	}
 }
 
 void Fountain::updateTrail() 
 {
-	// ÀÏÁ¤ °£°İÀ¸·Î ÀÚ±¹ ¾÷µ¥ÀÌÆ®
+	// ì¼ì • ê°„ê²©ìœ¼ë¡œ ìêµ­ ì—…ë°ì´íŠ¸
 	if (SDL_GetTicks() % trailUpdateTime == 0)
 	{
 		TrailPoint newPoint = { x, y, SDL_GetTicks() };
@@ -172,27 +172,27 @@ void Fountain::updateTrail()
 
 void Fountain::charge(int targetX, int targetY) 
 {
-	// ±âº» Å¬·¡½ºÀÇ charge ÇÔ¼ö È£Ãâ
+	// ê¸°ë³¸ í´ë˜ìŠ¤ì˜ charge í•¨ìˆ˜ í˜¸ì¶œ
 	Enemy::charge(targetX, targetY);
 
-	// ÀÚ±¹ ¾÷µ¥ÀÌÆ®
+	// ìêµ­ ì—…ë°ì´íŠ¸
 	updateTrail();
 }
 
 void Fountain::render(SDL_Renderer* renderer) 
 {
-	// ±âº» Å¬·¡½ºÀÇ render ÇÔ¼ö È£Ãâ
+	// ê¸°ë³¸ í´ë˜ìŠ¤ì˜ render í•¨ìˆ˜ í˜¸ì¶œ
 	Enemy::render(renderer);
 
-	// ÇöÀç ½Ã°£
+	// í˜„ì¬ ì‹œê°„
 	Uint32 currentTime = SDL_GetTicks();
 
-	// ÀÚ±¹ ·»´õ¸µ ¹× ÀÏÁ¤ ½Ã°£ °æ°úÇÑ ÀÚ±¹ Á¦°Å
+	// ìêµ­ ë Œë”ë§ ë° ì¼ì • ì‹œê°„ ê²½ê³¼í•œ ìêµ­ ì œê±°
 	for (auto it = trail.begin(); it != trail.end(); ) 
 	{
 		SDL_Rect trailRect = { it->x, it->y, trailWidth, trailHeight };
 
-		// ÀÏÁ¤ ½Ã°£ÀÌ °æ°úÇÏ¸é ÀÚ±¹À» Á¦°Å
+		// ì¼ì • ì‹œê°„ì´ ê²½ê³¼í•˜ë©´ ìêµ­ì„ ì œê±°
 		if (currentTime - it->createTime > trailLastTime)
 		{
 			it = trail.erase(it);
@@ -220,9 +220,9 @@ Compass::Compass(SDL_Renderer* renderer, int spwanX, int spwanY)
 
 void Compass::charge(Uint32 currentTime, Uint32 chargeStartTime, Uint32 chargeDuration)
 {
-	// ÀÏÁ¤ ½Ã°£ µ¿¾È µ¹Áø
+	// ì¼ì • ì‹œê°„ ë™ì•ˆ ëŒì§„
 	if (currentTime - chargeStartTime <= chargeDuration) {
-		// ´ë»ó À§Ä¡±îÁö ÀÏÁ¤ °£°İÀ¸·Î ÀÌµ¿
+		// ëŒ€ìƒ ìœ„ì¹˜ê¹Œì§€ ì¼ì • ê°„ê²©ìœ¼ë¡œ ì´ë™
 		int deltaX = compassTargetX - this->x;
 		int deltaY = compassTargetY - this->y;
 		double distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -258,7 +258,7 @@ void Compass::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
 		}
 	}
 
-	// ±âÁ¸ÀÇ ÀÌµ¿ ·ÎÁ÷
+	// ê¸°ì¡´ì˜ ì´ë™ ë¡œì§
 	x += directionX;
 	y += directionY;
 
@@ -282,7 +282,7 @@ void Compass::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
 
 	currentFrame = (currentFrame + 1) % (rows * columns);
 
-	// µ¹Áø ·ÎÁ÷ Ãß°¡
+	// ëŒì§„ ë¡œì§ ì¶”ê°€
 	if (isCharging) {
 		charge(currentTime, chargeStartTime, chargeDuration);
 	}
