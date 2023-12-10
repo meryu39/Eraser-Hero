@@ -5,13 +5,13 @@ Player::Player(SDL_Renderer* renderer)
     : health(100), dash(0), isColliding(false), isDashing(false), dashDirectionX(0), dashDirectionY(0), dashCollider(false), frameIndex(0),
     FRAME_WIDTH(256), NUM_FRAMES(4) , damage(0), shield(0), speed(0), state(0)
 {
-    // ÇÃ·¹ÀÌ¾î ÅØ½ºÃ³ ·Îµå
+    // í”Œë ˆì´ì–´ í…ìŠ¤ì²˜ ë¡œë“œ
     texture = IMG_LoadTexture(renderer, "player_walk.png");
     if (texture == nullptr) {
-        std::cerr << "ÇÃ·¹ÀÌ¾î ÅØ½ºÃ³ ·Îµå ½ÇÆĞ: " << IMG_GetError() << std::endl;
+        std::cerr << "í”Œë ˆì´ì–´ í…ìŠ¤ì²˜ ë¡œë“œ ì‹¤íŒ¨: " << IMG_GetError() << std::endl;
     }
 
-    // ÃÊ±â À§Ä¡ ¹× Å©±â ¼³Á¤
+    // ì´ˆê¸° ìœ„ì¹˜ ë° í¬ê¸° ì„¤ì •
     rect = { SCREEN_WIDTH / 2 - PLAYER_SIZE / 2, SCREEN_HEIGHT / 2 - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE };
     spriteRect = { 0, 0, 256, 192 };
 }
@@ -87,7 +87,7 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
                 isDashing = true;
                 spacePressed = true;
                 break;
-            //ÀÚ
+            //ì
             case SDLK_a:
                 if (currentStage >= 2)
                 {
@@ -97,7 +97,7 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
                     damage = 5;
                 }
                 break;
-            //È­ÀÌÆ®
+            //í™”ì´íŠ¸
             case SDLK_s:
                 if (currentStage >= 3)
                 {
@@ -107,7 +107,7 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
                     damage = 0;
                 }
                 break;
-            //µüÇ®
+            //ë”±í’€
             case SDLK_d:
                 if (currentStage >= 4)
                 {
@@ -187,7 +187,7 @@ void Player::handleCollision(std::vector<Enemy>& objectRects)
             y + PLAYER_SIZE > objectRects[i].getY()) {
 
             if (!isColliding && isDashing) {
-                // ÇÇÇØ ÀÔÈ÷´Â ºÎºĞ
+                // í”¼í•´ ì…íˆëŠ” ë¶€ë¶„
                 collidingTo = i;
                 health -= (objectRects[i].getDamage() - shield);
                 isColliding = true;
@@ -197,7 +197,7 @@ void Player::handleCollision(std::vector<Enemy>& objectRects)
 
     if (!isColliding) 
     {
-        // ¸ğµç °´Ã¼¿ÍÀÇ Ãæµ¹ÀÌ ³¡³µÀ» ¶§ isColliding ¸®¼Â
+        // ëª¨ë“  ê°ì²´ì™€ì˜ ì¶©ëŒì´ ëë‚¬ì„ ë•Œ isColliding ë¦¬ì…‹
         isColliding = false;
     }
 }
@@ -244,13 +244,13 @@ void Player::update(SDL_Renderer* renderer)
         }
     }
     
-    // ¾Ö´Ï¸ŞÀÌ¼Ç ÇÁ·¹ÀÓ ¾÷µ¥ÀÌÆ®
+    // ì• ë‹ˆë©”ì´ì…˜ í”„ë ˆì„ ì—…ë°ì´íŠ¸
     frameIndex = (frameIndex + 1) % NUM_FRAMES;
     spriteRect.x = frameIndex * FRAME_WIDTH;
 }
 
 void Player::render(SDL_Renderer* renderer) 
 {
-    // ÇÃ·¹ÀÌ¾î ·»´õ¸µ
+    // í”Œë ˆì´ì–´ ë Œë”ë§
     SDL_RenderCopy(renderer, texture, &spriteRect, &rect);
 }

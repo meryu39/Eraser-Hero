@@ -6,7 +6,7 @@
 #include "Enemy.h"
 #include "stage.h"
 
-// »ó¼ö Á¤ÀÇ
+// ìƒìˆ˜ ì •ì˜
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
 const int PLAYER_SIZE = 50;
@@ -19,9 +19,9 @@ SDL_Rect playerRect = { SCREEN_WIDTH / 2 - PLAYER_SIZE / 2, SCREEN_HEIGHT / 2 - 
 
 const int FRAME_WIDTH = 256;
 const int NUM_FRAMES = 4;
-int frameIndex = 0; // ÇöÀç ÇÁ·¹ÀÓ ÀÎµ¦½º
-SDL_Rect playerSpriteRect = { 0, 0, 256, 192 }; // °¢ ÇÁ·¹ÀÓÀÇ Å©±â¿¡ ¸Â°Ô Á¶Àı
-// ÇÔ¼ö ¼±¾ğ
+int frameIndex = 0; // í˜„ì¬ í”„ë ˆì„ ì¸ë±ìŠ¤
+SDL_Rect playerSpriteRect = { 0, 0, 256, 192 }; // ê° í”„ë ˆì„ì˜ í¬ê¸°ì— ë§ê²Œ ì¡°ì ˆ
+// í•¨ìˆ˜ ì„ ì–¸
 
 bool initSDL();
 void closeSDL();
