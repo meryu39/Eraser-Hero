@@ -1,10 +1,11 @@
 ﻿#include <SDL.h>
 #include <iostream>
 #include <SDL_image.h>
+#include <SDL_timer.h>
 
 // 상수 정의
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 1280;
+const int SCREEN_HEIGHT = 720;
 const int PLAYER_SIZE = 50;
 const int OBJECT_SIZE = 30;
 const int DASH_SPEED = 40;
@@ -32,6 +33,8 @@ int frameIndex = 0; // 현재 프레임 인덱스
 SDL_Rect playerSpriteRect = { 0, 0, 256, 192 }; // 각 프레임의 크기에 맞게 조절
 // 함수 선언
 
+int current = 0;
+
 bool initSDL();
 void closeSDL();
 void handleCollision();
@@ -41,6 +44,11 @@ void renderPlayerHealth();
 void renderPlayerDash();
 
 int player_state;
+
+Uint32 startTime = 0;
+Uint32 elapsedTime = 0;
+//1분
+const Uint32 MAX_TIME = 60000;  
 
 int main(int argc, char* args[]) {
     if (!initSDL()) {
@@ -56,6 +64,12 @@ int main(int argc, char* args[]) {
         SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
         SDL_RenderClear(gRenderer);
 
+        elapsedTime = SDL_GetTicks() - startTime;
+
+        // Render the timer gauge
+        SDL_Rect timerRect = { 10, 10, static_cast<int>(100 * (static_cast<float>(MAX_TIME - elapsedTime) / MAX_TIME)), 10 };
+        SDL_SetRenderDrawColor(gRenderer, 0, 0, 255, 255);
+        SDL_RenderFillRect(gRenderer, &timerRect);
         renderPlayer();
 
         SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
@@ -65,7 +79,11 @@ int main(int argc, char* args[]) {
         renderPlayerDash();
 
         SDL_RenderPresent(gRenderer);
-
+        //시간 지남 
+        if (elapsedTime >= MAX_TIME) {
+            //스테이지 넘김 함수 추가
+            break;
+        }
         Uint32 frameTime = SDL_GetTicks() - frameStart;
         if (frameTime < 16) {
             SDL_Delay(16 - frameTime);

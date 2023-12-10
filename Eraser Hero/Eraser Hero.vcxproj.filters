@@ -18,15 +18,18 @@
     <ClCompile Include="Eraser Hero.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="player_anim.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="Enemy.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stage.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Enemy.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Weapon.h">
+    <ClInclude Include="stage.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
