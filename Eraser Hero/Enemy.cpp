@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "Player.h"
 
 Enemy::Enemy()
 {
@@ -95,18 +96,6 @@ SDL_Texture* Enemy::loadTexture(const char* path, SDL_Renderer* renderer) {
 	return texture;
 }
 
-bool Enemy::checkCollision(Player& other) //충돌 대상은 플레이어로 한정 , 아직 플레이어 클래스 구현전이라 오류가 이빠이... ㅎㅎ;;;
-{
-	// 현재 오브젝트의 경계 상자
-	SDL_Rect rect1 = { x, y, width, height };
-
-	// 다른 오브젝트의 경계 상자
-	SDL_Rect rect2 = { other.x, other.y, other.width, other.height };
-
-	// 충돌 여부를 SDL의 함수를 사용하여 확인
-	return SDL_HasIntersection(&rect1, &rect2) == SDL_TRUE;
-}
-
 Pencil::Pencil(SDL_Renderer* renderer, int spwanX, int spwanY)
 {
 	walkSpriteSheetPath = (char*)"assets\\walk\\Pencil-Sheet.gif";
@@ -154,7 +143,7 @@ Fountain::Fountain(SDL_Renderer* renderer, int spwanX, int spwanY)
 
 
 void Fountain::loadTrailTexture(SDL_Renderer* renderer) {
-	trailTexture = loadTexture("!장판이미지 경로!", renderer);
+	trailTexture = loadTexture("assets\\trail.png", renderer);
 	if (!trailTexture) {
 		cerr << "자국 이미지를 로드하는데 실패했습니다." << endl;
 	}
@@ -193,7 +182,7 @@ void Fountain::render(SDL_Renderer* renderer)
 		SDL_Rect trailRect = { it->x, it->y, trailWidth, trailHeight };
 
 		// 일정 시간이 경과하면 자국을 제거
-		if (currentTime - it->createTime > trailLastTime)
+		if (static_cast<int>(currentTime - it->createTime) > trailLastTime)
 		{
 			it = trail.erase(it);
 		}

@@ -16,9 +16,20 @@ class Enemy
 public:
 	Enemy();
 	~Enemy();
+	int getDamage() { return damage; }
+	int getSpeed() { return speed; }
+	int getX() { return x; }
+	int getY() { return y; }
+	int getWidth() { return width; }
+	int getHeight() { return height; }
+
+	void setDamage(int newDamage) { damage = newDamage; }
+	void setSpeed(int newSpeed) { speed = newSpeed; }
+	void setX(int newX) { x = newX; }
+	void setY(int newY) { y = newY; }
+
 	void charge(int targetX, int targetY);
 	void update(Uint32 lastUpdateTime, Uint32 updateInterval);
-	bool checkCollision(Player& other);
 	void render(SDL_Renderer* renderer);
 protected:
 	int resistance; //적 유형에 따른 밀림저항

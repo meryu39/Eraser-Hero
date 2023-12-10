@@ -2,14 +2,7 @@
 #include <iostream>
 #include <SDL_image.h>
 #include <SDL_timer.h>
-
-// 상수 정의
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
-const int PLAYER_SIZE = 50;
-const int OBJECT_SIZE = 30;
-const int DASH_SPEED = 40;
-const int MAX_DASH = 100;
+#include "Player.h"
 
 // 전역 변수
 SDL_Window* gWindow = nullptr;
@@ -55,12 +48,23 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
+    Player player(gRenderer);
+    vector<Enemy> enemys;
+    Pencil pencil(gRenderer, 100, 100);
+    enemys.push_back(pencil);
+
     while (true) {
         Uint32 frameStart = SDL_GetTicks();
 
-        handleInput();
-        handleCollision();
+        //objects == enemy의 벡터 배열
+        player.handleInput(enemys);
 
+        player.handleCollision(enemys);
+
+        //플레이어 상태 업데이트
+        player.update(gRenderer);
+
+        //그래픽 렌더링
         SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
         SDL_RenderClear(gRenderer);
 
@@ -71,6 +75,10 @@ int main(int argc, char* args[]) {
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 255, 255);
         SDL_RenderFillRect(gRenderer, &timerRect);
         renderPlayer();
+        // 다른 렌더링 작업 (배경, 적 등)
+
+        // 플레이어 렌더링
+        player.render(gRenderer);
 
         SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
         SDL_RenderFillRect(gRenderer, &objectRect);
