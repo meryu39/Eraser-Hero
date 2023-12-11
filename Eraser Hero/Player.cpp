@@ -3,8 +3,8 @@
 extern int currentStage;
 
 Player::Player(SDL_Renderer* renderer)
-    : health(100), dash(0), isColliding(false), isDashing(false), dashDirectionX(0), dashDirectionY(0), dashCollider(false),
-    damage(0), shield(0), speed(0), state(0), x(0), y(0), player_state(0), spacePressed(false)
+    : health(1000), dash(0), isColliding(false), isDashing(false), dashDirectionX(0), dashDirectionY(0), dashCollider(false),
+    damage(100), shield(0), speed(0), state(0), x(1000), y(100), player_state(0), spacePressed(false), width(256), height(192)
 {
     SCREEN_WIDTH = 1280;
     SCREEN_HEIGHT = 720;
@@ -12,6 +12,12 @@ Player::Player(SDL_Renderer* renderer)
     OBJECT_SIZE = 30;
     DASH_SPEED = 40;
     MAX_DASH = 100;
+
+
+    rect.x = x;
+    rect.y = y;
+    rect.w = width;
+    rect.h = height;
 }
 
 Player::~Player() 
@@ -113,19 +119,18 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
             {
                 isDashing = false;
                 spacePressed = false;
-                dashCollider = true;
                 
                 x += dashDirectionX * dash;
                 y += dashDirectionY * dash;
 
-                if (isColliding) 
+                if (dashCollider) 
                 {
                     int pushDistance = dash;
                     int pushX = dashDirectionX * pushDistance;
                     int pushY = dashDirectionY * pushDistance;
 
-                    objectRects[collidingTo].setX(objectRects[collidingTo].getX() + pushX + damage);
-                    objectRects[collidingTo].setY(objectRects[collidingTo].getY() + pushY + damage);
+                    objectRects[collidingTo].setX(objectRects[collidingTo].getX() + pushX - damage);
+                    objectRects[collidingTo].setY(objectRects[collidingTo].getY() + pushY);
                 }
 
                 dash = 0;
@@ -170,14 +175,17 @@ void Player::handleCollision(std::vector<Enemy>& objectRects)
         if (x < objectRects[i].getX() + objectRects[i].getWidth() &&
             x + PLAYER_SIZE > objectRects[i].getX() &&
             y < objectRects[i].getY() + objectRects[i].getHeight() &&
-            y + PLAYER_SIZE > objectRects[i].getY()) {
-
-            if (isColliding && !isDashing) {
-                // 피해 입히는 부분
-                collidingTo = i;
-                health -= (objectRects[i].getDamage() - shield);
-                isColliding = true;
-            }
+            y + PLAYER_SIZE > objectRects[i].getY())
+        {
+            collidingTo = i;
+            dashCollider = true;
+            isColliding = true;
+                if (isColliding && !isDashing)
+                {
+                    // 피해 입히는 부분
+                    health -= (objectRects[i].getDamage() - shield);
+                    isColliding = true;
+                }
         }
     }
 
@@ -194,7 +202,7 @@ void Player::update(SDL_Renderer* renderer)
     {
         if (state == 0)
         {
-            loadTexture((const char* )"assets\\nomalDash.png", renderer);
+            loadTexture((const char* )"assets\\charge.png", renderer);
         }
         else if (state == 1)
         {

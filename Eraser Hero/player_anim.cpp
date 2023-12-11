@@ -14,11 +14,13 @@ const int OBJECT_SIZE = 30;
 // 함수 선언
 
 int current = 0;
-
+int currentStage = 0;
+bool story_start = true;
 bool initSDL();
 void closeSDL();
 void renderPlayerHealth(Player player);
 void renderPlayerDash(Player player);
+
 
 int player_state;
 
@@ -34,15 +36,19 @@ int main(int argc, char* args[]) {
     if (!initSDL()) {
         return -1;
     }
-
+    srand(time(0));
     Player player(gRenderer);
     vector<Enemy> enemys;
     Pencil pencil(gRenderer, 100, 100);
     enemys.push_back(pencil);
-    Sharp sharp (gRenderer, 200, 200);
+    Sharp sharp (gRenderer, 100, 200);
     enemys.push_back(sharp);
 
     while (true) {
+        if (enemys.empty())
+        {
+            
+        }
 
         Uint32 frameStart = SDL_GetTicks();
         SDL_RenderClear(gRenderer);
@@ -60,11 +66,32 @@ int main(int argc, char* args[]) {
 
         for (int i = 0; i < enemys.size(); i++)
         {
+            if (player.getX() - enemys[i].getX() < 0)
+            {
+                enemys[i].setDirectionX(-1);
+            }
+            else if (player.getX() - enemys[i].getX() > 0)
+            {
+                enemys[i].setDirectionX(1);
+            }
+
+            if (player.getY() - enemys[i].getY() < 0)
+            {
+                enemys[i].setDirectionY(-1);
+            }
+            else if (player.getY() - enemys[i].getY() > 0)
+            {
+                enemys[i].setDirectionY(1);
+            }
             enemys[i].update(lastUpdateTime, updateInterval, gRenderer);
             enemys[i].drawTexture(gRenderer, enemys[i].currentTexture);
             if (enemys[i].getIsCharging())
             {
                 enemys[i].charge(player.getX(), player.getY());
+            }
+            if (enemys[i].isOut)
+            {
+                enemys.erase(enemys.begin() + i);
             }
         }
 
@@ -122,7 +149,7 @@ bool initSDL() {
     }
 
     // 플레이어 텍스처 로드
-    playerTexture = IMG_LoadTexture(gRenderer, "player_walk.png");
+    playerTexture = IMG_LoadTexture(gRenderer, "assets\\back.png");
     if (playerTexture == nullptr) {
         std::cerr << "플레이어 텍스처 로드 실패: " << IMG_GetError() << std::endl;
         return false;

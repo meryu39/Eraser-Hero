@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+
 using namespace std;
 
 
@@ -26,9 +27,13 @@ public:
 
 	void setDamage(int newDamage) { damage = newDamage; }
 	void setSpeed(int newSpeed) { speed = newSpeed; }
+	void setDirectionX(int newdirection) { directionX = newdirection; }
+	void setDirectionY(int newdirection) { directionY = newdirection; }
 	void setX(int newX) { x = newX; }
 	void setY(int newY) { y = newY; }
 
+	bool isOut;
+	SDL_Rect rect;
 	SDL_Texture* currentTexture;
 	void charge(int targetX, int targetY);
 	void update(Uint32 lastUpdateTime, Uint32 updateInterval, SDL_Renderer* renderer);

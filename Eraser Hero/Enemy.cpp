@@ -1,13 +1,19 @@
 #include "Enemy.h"
-#include "Player.h"
+
 
 Enemy::Enemy()
 {
+	isOut = false;
 	width = 256;
 	height = 192;
 	directionX = 0;
 	directionY = 1;
 	isCharging = false;
+
+	rect.x = x;
+	rect.y = y;
+	rect.w = width;
+	rect.h = height;
 }
 
 Enemy::~Enemy() 
@@ -41,7 +47,8 @@ void Enemy::update(Uint32 lastUpdateTime, Uint32 updateInterval, SDL_Renderer* r
 	Uint32 currentTime = SDL_GetTicks();
 	currentSpriteSheetPath = isCharging ? chargeSpriteSheetPath : walkSpriteSheetPath;
 	loadTexture(currentSpriteSheetPath, renderer);
-	if (currentTime - lastUpdateTime >= updateInterval) {
+	if (currentTime - lastUpdateTime >= updateInterval) 
+	{
 		lastUpdateTime = currentTime;
 
 		directionX = rand() % 2;
@@ -53,21 +60,17 @@ void Enemy::update(Uint32 lastUpdateTime, Uint32 updateInterval, SDL_Renderer* r
 	y += directionY;
 
 	if (x < 0) {
-		x = 0;
-		directionX *= -1;
+		isOut = true;
 	}
 	else if (x > SCREEN_WIDTH - 50) {
-		x = SCREEN_WIDTH - 50;
-		directionX *= -1;
+		isOut = true;
 	}
 
 	if (y < 0) {
-		y = 0;
-		directionY *= -1;
+		isOut = true;
 	}
 	else if (y > SCREEN_HEIGHT - 50) {
-		y = SCREEN_HEIGHT - 50;
-		directionY *= -1;
+		isOut = true;
 	}
 }
 
@@ -102,19 +105,19 @@ Pencil::Pencil(SDL_Renderer* renderer, int spwanX, int spwanY)
 	x = spwanX;
 	y = spwanY;
 	resistance = 0;
-	damage = 10;
+	damage = 1;
 	speed = 10;
 }
 
 
 Sharp::Sharp(SDL_Renderer* renderer, int spwanX, int spwanY)
 {
-	walkSpriteSheetPath = (char*)"assets\\sharp.png";
+ 	walkSpriteSheetPath = (char*)"assets\\sharp.png";
 	chargeSpriteSheetPath = (char*)"assets\\sharp.png";
 	x = spwanX;
 	y = spwanY;
 	resistance = 2;
-	damage = 15;
+	damage = 2;
 	speed = 15;
 }
 

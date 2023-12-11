@@ -27,7 +27,7 @@ public:
     void drawTexture(SDL_Renderer* renderer, SDL_Texture* texture);
     SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer);
 
-
+    SDL_Rect rect;
 private:
 
     int collidingTo;
@@ -39,6 +39,8 @@ private:
     int shield;
     int speed;
     int damage;
+    int width;
+    int height;
     bool isColliding;
     bool isDashing;
     bool spacePressed;
