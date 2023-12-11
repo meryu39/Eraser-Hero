@@ -23,7 +23,7 @@ void closeSDL();
 void renderPlayerHealth(Player player);
 void renderPlayerDash(Player player);
 
-
+int mv_stage = 0;
 int player_state;
 
 const char* stage0[] = {
@@ -58,7 +58,7 @@ const char* stage2[] = {
 const char* stage3[] = {
     "story\\6_1.png",
     "story\\6_2.png",
-    "story\\6_3.png"
+    "story\\6_3.png",
     "story\\7_1.png",
     "story\\7_2.png",
     "story\\7_3.png",
@@ -101,21 +101,80 @@ int main(int argc, char* args[]) {
     srand(time(0));
     Player player(gRenderer);
     vector<Enemy> enemys;
-    Pencil pencil(gRenderer, 100, 100);
-    enemys.push_back(pencil);
-    Sharp sharp (gRenderer, 100, 200);
-    enemys.push_back(sharp);
+   
+    int mv_stage = 0;
+    if (current_Stage == 0) {
+        //연필몹
+        Pencil pencil1(gRenderer, 120, 120);
+        enemys.push_back(pencil1);
+        Pencil pencil2(gRenderer, 400, 400);
+        enemys.push_back(pencil2);
+        Pencil pencil3(gRenderer, 400, 600);
+        enemys.push_back(pencil3);
+        Pencil pencil4(gRenderer, 800, 210);
+        enemys.push_back(pencil4);
+    }
+
+    //Sharp sharp (gRenderer, 100, 200);
+    //enemys.push_back(sharp);
 
     while (true) {
         if (enemys.empty())
         {
             current_Stage++;
             story_start = true;
+            printf("현재 적 빔");
         }
         if (story_start) {
             conversation();
+            
+        }
+        if (current_Stage == 1) {
+            if (mv_stage == 0) {
+                printf("샤프몹");
+                Sharp Sharp1(gRenderer, 120, 120);
+                enemys.push_back(Sharp1);
+                Sharp Sharp2(gRenderer, 400, 400);
+                enemys.push_back(Sharp2);
+                Sharp Sharp3(gRenderer, 400, 600);
+                enemys.push_back(Sharp3);
+                Sharp Sharp4(gRenderer, 800, 210);
+                enemys.push_back(Sharp4);
+                mv_stage = 1;
+                
+            }
         }
 
+        else if (current_Stage == 2) {
+            if (mv_stage == 1) {
+                {
+                    printf("만년필몹");
+                    Fountain Fountain1(gRenderer, 120, 120);
+                    enemys.push_back(Fountain1);
+                    Fountain Fountain2(gRenderer, 400, 400);
+                    enemys.push_back(Fountain2);
+                    Fountain Fountain3(gRenderer, 400, 600);
+                    enemys.push_back(Fountain3);
+                    Fountain Fountain4(gRenderer, 800, 210);
+                    enemys.push_back(Fountain4);
+                    mv_stage = 2;
+                }
+            }
+        }
+        else if (current_Stage == 3) {
+            if (mv_stage == 2) {
+                {
+                    printf("보스몹");
+                    Compass Compass1(gRenderer, 120, 120);
+                    enemys.push_back(Compass1);
+                    Compass Compass2(gRenderer, 400, 400);
+                    enemys.push_back(Compass2);
+                    mv_stage = 3;
+                }
+            }
+        }
+
+       
         Uint32 frameStart = SDL_GetTicks();
         SDL_RenderClear(gRenderer);
         SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
@@ -130,36 +189,36 @@ int main(int argc, char* args[]) {
         // 플레이어 렌더링
         player.drawTexture(gRenderer, player.currentTexture);
 
-        for (int i = 0; i < enemys.size(); i++)
-        {
-            if (player.getX() - enemys[i].getX() < 0)
-            {
+        for (int i = 0; i < enemys.size(); i++) {
+            int offsetX = 20; 
+            int offsetY = 10; 
+
+            if (player.getX() - enemys[i].getX() < -offsetX) {
                 enemys[i].setDirectionX(-1);
             }
-            else if (player.getX() - enemys[i].getX() > 0)
-            {
+            else if (player.getX() - enemys[i].getX() > offsetX) {
                 enemys[i].setDirectionX(1);
             }
 
-            if (player.getY() - enemys[i].getY() < 0)
-            {
+            if (player.getY() - enemys[i].getY() < -offsetY) {
                 enemys[i].setDirectionY(-1);
             }
-            else if (player.getY() - enemys[i].getY() > 0)
-            {
+            else if (player.getY() - enemys[i].getY() > offsetY) {
                 enemys[i].setDirectionY(1);
             }
+
             enemys[i].update(lastUpdateTime, updateInterval, gRenderer);
             enemys[i].drawTexture(gRenderer, enemys[i].currentTexture);
-            if (enemys[i].getIsCharging())
-            {
+
+            if (enemys[i].getIsCharging()) {
                 enemys[i].charge(player.getX(), player.getY());
             }
-            if (enemys[i].isOut)
-            {
+
+            if (enemys[i].isOut) {
                 enemys.erase(enemys.begin() + i);
             }
         }
+
 
         elapsedTime = SDL_GetTicks() - startTime;
 
@@ -288,10 +347,12 @@ void conversation() {
         else if (current_Stage == 1) {
             currentStage = stage1;
             totalImages = sizeof(stage1) / sizeof(stage1[0]);
+            
         }
         else if (current_Stage == 2) {
             currentStage = stage2;
             totalImages = sizeof(stage2) / sizeof(stage2[0]);
+
         }
         else if (current_Stage == 3) {
             currentStage = stage3;
@@ -301,8 +362,6 @@ void conversation() {
             currentStage = stage4;
             totalImages = sizeof(stage4) / sizeof(stage4[0]);
         }
-    
-       
     
         renderStageImage(currentStage[currentImageIndex]);
         SDL_RenderPresent(gRenderer);
@@ -317,9 +376,10 @@ void conversation() {
                 if (e.key.keysym.sym == SDLK_SPACE) {
         
                     currentImageIndex++;
-
+                    
                     if (currentImageIndex >= totalImages) {
                         story_start = false;  
+                        printf("%d", current_Stage);
                         return;
                     }
                 }
