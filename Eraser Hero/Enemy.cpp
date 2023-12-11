@@ -39,6 +39,11 @@ void Enemy::charge(int targetX, int targetY)
 
 void Enemy::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
 	Uint32 currentTime = SDL_GetTicks();
+	if (isCharging)
+	{
+		columns = 1;
+		rows = 9;
+	}
 	if (currentTime - lastUpdateTime >= updateInterval) {
 		lastUpdateTime = currentTime;
 
@@ -73,10 +78,10 @@ void Enemy::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
 }
 
 void Enemy::render(SDL_Renderer* renderer) {
-	int frameWidth = SCREEN_WIDTH / columns;
-	int frameHeight = SCREEN_HEIGHT / rows;
+	int frameWidth = SCREEN_WIDTH / rows;
+	int frameHeight = SCREEN_HEIGHT / columns;
 
-	SDL_Rect srcRect = { (currentFrame % columns) * frameWidth, (currentFrame / columns) * frameHeight, frameWidth, frameHeight };
+	SDL_Rect srcRect = { (currentFrame % rows) * frameWidth, (currentFrame / columns) * frameHeight, frameWidth, frameHeight };
 	SDL_Rect destRect = { x, y, frameWidth, frameHeight };
 
 	SDL_Texture* currentTexture = isCharging ? chargeTexture : walkTexture;
@@ -102,6 +107,8 @@ Pencil::Pencil(SDL_Renderer* renderer, int spwanX, int spwanY)
 	chargeSpriteSheetPath = (char*)"assets\\charge\\Pencil-Sheet.gif";
 	x = spwanX;
 	y = spwanY;
+	columns = 1;
+	rows = 4;
 	resistance = 0;
 	damage = 10;
 	speed = 10;
@@ -116,6 +123,8 @@ Sharp::Sharp(SDL_Renderer* renderer, int spwanX, int spwanY)
 	chargeSpriteSheetPath = (char*)"assets\\charge\\Sharp_pen_2-Sheet.gif";
 	x = spwanX;
 	y = spwanY;
+	columns = 1;
+	rows = 4;
 	resistance = 2;
 	damage = 15;
 	speed = 15;
@@ -129,6 +138,8 @@ Fountain::Fountain(SDL_Renderer* renderer, int spwanX, int spwanY)
 	chargeSpriteSheetPath = (char*)"assets\\charge\\Fountain_pen-Sheet.gif";
 	x = spwanX;
 	y = spwanY;
+	columns = 1;
+	rows = 4;
 	resistance = 0;
 	damage = 10;
 	speed = 10;
@@ -200,6 +211,8 @@ Compass::Compass(SDL_Renderer* renderer, int spwanX, int spwanY)
 	chargeSpriteSheetPath = (char*)"assets\\charge\\Compas-Sheet.gif";
 	x = spwanX;
 	y = spwanY;
+	columns = 1;
+	rows = 6;
 	resistance = 4;
 	damage = 20;
 	speed = 15;
@@ -273,6 +286,8 @@ void Compass::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
 
 	// 돌진 로직 추가
 	if (isCharging) {
+		columns = 1;
+		rows = 10;
 		charge(currentTime, chargeStartTime, chargeDuration);
 	}
 }

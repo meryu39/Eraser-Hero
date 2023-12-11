@@ -1,5 +1,7 @@
 #include "Stage.h"
 
+int currentStage;
+
 Stage::Stage(SDL_Renderer* renderer)
 {
     stageRenderer = renderer;

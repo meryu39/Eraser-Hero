@@ -16,5 +16,3 @@ private:
     SDL_Renderer* stageRenderer;
 };
 
-extern int currentStage; 
-

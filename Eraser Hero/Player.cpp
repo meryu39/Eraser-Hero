@@ -1,9 +1,10 @@
 #include "Player.h"
 
+extern int currentStage;
 
 Player::Player(SDL_Renderer* renderer)
     : health(100), dash(0), isColliding(false), isDashing(false), dashDirectionX(0), dashDirectionY(0), dashCollider(false), frameIndex(0),
-    FRAME_WIDTH(256), NUM_FRAMES(4) , damage(0), shield(0), speed(0), state(0)
+    FRAME_WIDTH(256), NUM_FRAMES(4) , damage(0), shield(0), speed(0), state(0), x(0), y(0), collidingTo(0), player_state(0), spacePressed(false)
 {
     // 플레이어 텍스처 로드
     texture = IMG_LoadTexture(renderer, "player_walk.png");
@@ -11,6 +12,12 @@ Player::Player(SDL_Renderer* renderer)
         std::cerr << "플레이어 텍스처 로드 실패: " << IMG_GetError() << std::endl;
     }
 
+    SCREEN_WIDTH = 1280;
+    SCREEN_HEIGHT = 720;
+    PLAYER_SIZE = 50;
+    OBJECT_SIZE = 30;
+    DASH_SPEED = 40;
+    MAX_DASH = 100;
     // 초기 위치 및 크기 설정
     rect = { SCREEN_WIDTH / 2 - PLAYER_SIZE / 2, SCREEN_HEIGHT / 2 - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE };
     spriteRect = { 0, 0, 256, 192 };
@@ -24,7 +31,7 @@ Player::~Player()
 void Player::anim() 
 {
     frameIndex = (frameIndex + 1) % NUM_FRAMES;
-    playerSpriteRect.x = frameIndex * FRAME_WIDTH;
+    spriteRect.x = frameIndex * FRAME_WIDTH;
 }
 
 void Player::handleInput(std::vector<Enemy>& objectRects) 
@@ -70,7 +77,7 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
             anim();
 
         }
-        playerSpriteRect.y = 192 * player_state;
+        spriteRect.y = 192 * player_state;
     }
 
     SDL_Event e;
@@ -208,18 +215,22 @@ void Player::update(SDL_Renderer* renderer)
     {
         if (state == 0)
         {
+            NUM_FRAMES = 9;
             texture = IMG_LoadTexture(renderer, "assets\\charge\\Eraser - Sheet.gif");
         }
         else if (state == 1)
         {
+            NUM_FRAMES = 9;
             texture = IMG_LoadTexture(renderer, "assets\\ruler\\rulerCharge.png");
         }
         else if (state == 2)
         {
+            NUM_FRAMES = 9;
             texture = IMG_LoadTexture(renderer, "assets\\white\\whiteCharge.png");
         }
         else if (state == 3)
         {
+            NUM_FRAMES = 9;
             texture = IMG_LoadTexture(renderer, "!assets\\ddak\\ddakCharge.png");
         }
     }
@@ -228,18 +239,22 @@ void Player::update(SDL_Renderer* renderer)
     {
         if (state == 0)
         {
+            NUM_FRAMES = 4;
             texture = IMG_LoadTexture(renderer, "assets\\walk\\Eraser-Sheet.gif");
         }
         else if (state == 1)
         {
+            NUM_FRAMES = 4;
             texture = IMG_LoadTexture(renderer, "assets\\ruler\\rulerWalk.png");
         }
         else if (state == 2)
         {
+            NUM_FRAMES = 4;
             texture = IMG_LoadTexture(renderer, "assets\\white\\whiteCharge.png");
         }
         else if (state == 3)
         {
+            NUM_FRAMES = 4;
             texture = IMG_LoadTexture(renderer, "assets\\ddak\\ddakwalk.png");
         }
     }

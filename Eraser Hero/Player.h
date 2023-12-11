@@ -6,38 +6,18 @@
 #include "Enemy.h"
 #include "stage.h"
 
-// 상수 정의
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
-const int PLAYER_SIZE = 50;
-const int OBJECT_SIZE = 30;
-const int DASH_SPEED = 40;
-const int MAX_DASH = 100;
-
-SDL_Rect playerRect = { SCREEN_WIDTH / 2 - PLAYER_SIZE / 2, SCREEN_HEIGHT / 2 - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE };
-
-
-const int FRAME_WIDTH = 256;
-const int NUM_FRAMES = 4;
-int frameIndex = 0; // 현재 프레임 인덱스
-SDL_Rect playerSpriteRect = { 0, 0, 256, 192 }; // 각 프레임의 크기에 맞게 조절
 // 함수 선언
 
 bool initSDL();
 void closeSDL();
-void handleCollision();
-void handleInput();
-void renderPlayer();
-void renderPlayerHealth();
-void renderPlayerDash();
-
-int player_state;
 
 class Player {
 public:
     Player(SDL_Renderer* renderer);
     ~Player();
 
+    int getHealth() { return health; }
+    int getDash() { return dash; }
     void handleInput(std::vector<Enemy>& objectRects);
     void handleCollision(std::vector<Enemy>& objectRects);
     void update(SDL_Renderer* renderer);
@@ -65,7 +45,15 @@ private:
     int dashDirectionY;
     int dashCollider;
     int frameIndex;
+    int player_state;
 
-    const int FRAME_WIDTH;
-    const int NUM_FRAMES;
+    int FRAME_WIDTH; //스프라이트 넓이
+    int NUM_FRAMES; //스프라이트 개수
+
+    int SCREEN_WIDTH = 1280;
+    int SCREEN_HEIGHT = 720;
+    int PLAYER_SIZE = 50;
+    int OBJECT_SIZE = 30;
+    int DASH_SPEED = 40;
+    int MAX_DASH = 100;
 };

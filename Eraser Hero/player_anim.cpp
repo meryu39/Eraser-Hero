@@ -9,37 +9,25 @@ SDL_Window* gWindow = nullptr;
 SDL_Renderer* gRenderer = nullptr;
 SDL_Texture* playerTexture = nullptr;
 
-SDL_Rect playerRect = { SCREEN_WIDTH / 2 - PLAYER_SIZE / 2, SCREEN_HEIGHT / 2 - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE };
+const int OBJECT_SIZE = 30;
+
 SDL_Rect objectRect = { SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, OBJECT_SIZE, OBJECT_SIZE };
-
-int playerHealth = 100;
-int playerDash = 0;
-bool isColliding = false;
-bool isDashing = false;
-int dashDirectionX = 0;
-int dashDirectionY = 0;
-bool dashCollider = false;
-
-const int FRAME_WIDTH = 256;
-const int NUM_FRAMES = 4;
-int frameIndex = 0; // 현재 프레임 인덱스
-SDL_Rect playerSpriteRect = { 0, 0, 256, 192 }; // 각 프레임의 크기에 맞게 조절
 // 함수 선언
 
 int current = 0;
 
 bool initSDL();
 void closeSDL();
-void handleCollision();
-void handleInput();
-void renderPlayer();
-void renderPlayerHealth();
-void renderPlayerDash();
+void renderPlayerHealth(Player player);
+void renderPlayerDash(Player player);
 
 int player_state;
 
 Uint32 startTime = 0;
 Uint32 elapsedTime = 0;
+Uint32 lastUpdateTime = 0; // 초기값 설정
+Uint32 updateInterval = 10000; // 예: 1000 밀리초마다 업데이트
+
 //1분
 const Uint32 MAX_TIME = 60000;  
 
@@ -52,8 +40,11 @@ int main(int argc, char* args[]) {
     vector<Enemy> enemys;
     Pencil pencil(gRenderer, 100, 100);
     enemys.push_back(pencil);
+    Sharp sharp (gRenderer, 200, 200);
+    enemys.push_back(sharp);
 
     while (true) {
+
         Uint32 frameStart = SDL_GetTicks();
 
         //objects == enemy의 벡터 배열
@@ -64,9 +55,17 @@ int main(int argc, char* args[]) {
         //플레이어 상태 업데이트
         player.update(gRenderer);
 
+        // 플레이어 렌더링
+        player.render(gRenderer);
+
         //그래픽 렌더링
         SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-        SDL_RenderClear(gRenderer);
+
+        for (int i = 0; i < enemys.size(); i++)
+        {
+            enemys[i].update(lastUpdateTime, updateInterval);
+            enemys[i].render(gRenderer);
+        }
 
         elapsedTime = SDL_GetTicks() - startTime;
 
@@ -74,18 +73,13 @@ int main(int argc, char* args[]) {
         SDL_Rect timerRect = { 10, 10, static_cast<int>(100 * (static_cast<float>(MAX_TIME - elapsedTime) / MAX_TIME)), 10 };
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 255, 255);
         SDL_RenderFillRect(gRenderer, &timerRect);
-        renderPlayer();
-        // 다른 렌더링 작업 (배경, 적 등)
-
-        // 플레이어 렌더링
-        player.render(gRenderer);
 
         SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
         SDL_RenderFillRect(gRenderer, &objectRect);
 
-        renderPlayerHealth();
-        renderPlayerDash();
-
+        renderPlayerHealth(player);
+        renderPlayerDash(player);
+        
         SDL_RenderPresent(gRenderer);
         //시간 지남 
         if (elapsedTime >= MAX_TIME) {
@@ -96,6 +90,8 @@ int main(int argc, char* args[]) {
         if (frameTime < 16) {
             SDL_Delay(16 - frameTime);
         }
+
+        lastUpdateTime = SDL_GetTicks();
     }
 
     closeSDL();
@@ -145,147 +141,15 @@ void closeSDL() {
     IMG_Quit();
 }
 
-void handleCollision() {
-    if (playerRect.x < objectRect.x + OBJECT_SIZE &&
-        playerRect.x + PLAYER_SIZE > objectRect.x &&
-        playerRect.y < objectRect.y + OBJECT_SIZE &&
-        playerRect.y + PLAYER_SIZE > objectRect.y) {
 
-        if (!isColliding && !dashCollider) {
-            playerHealth -= 10;
-            std::cout << "플레이어 체력: " << playerHealth << std::endl;
-            isColliding = true;
-            isDashing = false;
-        }
-    }
-    else if (isColliding) {
-        isColliding = false;
-    }
-}
-
-void anim() {
-    frameIndex = (frameIndex + 1) % NUM_FRAMES;
-    playerSpriteRect.x = frameIndex * FRAME_WIDTH;
-}
-
-void handleInput() {
-    static bool spacePressed = false;
-    const Uint8* keyboardState = SDL_GetKeyboardState(nullptr);
-
-
-    int moveSpeed = 5;
-
-    if (isDashing) {
-        moveSpeed = DASH_SPEED;
-    }
-
-    if (!spacePressed) {
-        if (keyboardState[SDL_SCANCODE_UP]) {
-            playerRect.y -= moveSpeed;
-            dashDirectionX = 0;
-            dashDirectionY = -1;
-        }
-        if (keyboardState[SDL_SCANCODE_DOWN]) {
-            playerRect.y += moveSpeed;
-            dashDirectionX = 0;
-            dashDirectionY = 1;
-        }
-        if (keyboardState[SDL_SCANCODE_LEFT]) {
-            playerRect.x -= moveSpeed;
-            dashDirectionX = -1;
-            dashDirectionY = 0;
-            player_state = 0;
-            anim();
-        }
-        if (keyboardState[SDL_SCANCODE_RIGHT]) {
-            playerRect.x += moveSpeed;
-            dashDirectionX = 1;
-            dashDirectionY = 0;
-            player_state = 1;
-            anim();
-
-        }
-        playerSpriteRect.y = 192 * player_state;
-    }
-
-    SDL_Event e;
-    while (SDL_PollEvent(&e) != 0) {
-        if (e.type == SDL_QUIT) {
-            closeSDL();
-            exit(0);
-        }
-        else if (e.type == SDL_KEYDOWN) {
-            switch (e.key.keysym.sym) {
-            case SDLK_SPACE:
-                isDashing = true;
-                spacePressed = true;
-                break;
-            }
-        }
-        else if (e.type == SDL_KEYUP) {
-            if (e.key.keysym.sym == SDLK_SPACE) {
-                isDashing = false;
-                spacePressed = false;
-                dashCollider = true;
-
-                playerRect.x += dashDirectionX * playerDash;
-                playerRect.y += dashDirectionY * playerDash;
-
-                if (playerRect.x < objectRect.x + OBJECT_SIZE &&
-                    playerRect.x + PLAYER_SIZE > objectRect.x &&
-                    playerRect.y < objectRect.y + OBJECT_SIZE &&
-                    playerRect.y + PLAYER_SIZE > objectRect.y) {
-
-                    int pushDistance = playerDash;
-                    int pushX = dashDirectionX * pushDistance;
-                    int pushY = dashDirectionY * pushDistance;
-
-                    objectRect.x += pushX;
-                    objectRect.y += pushY;
-                }
-
-                playerDash = 0;
-            }
-        }
-    }
-
-    if (isDashing && spacePressed) {
-        if (keyboardState[SDL_SCANCODE_UP]) {
-            dashDirectionX = 0;
-            dashDirectionY = -1;
-        }
-        if (keyboardState[SDL_SCANCODE_DOWN]) {
-            dashDirectionX = 0;
-            dashDirectionY = 1;
-        }
-        if (keyboardState[SDL_SCANCODE_LEFT]) {
-            dashDirectionX = -1;
-            dashDirectionY = 0;
-        }
-        if (keyboardState[SDL_SCANCODE_RIGHT]) {
-            dashDirectionX = 1;
-            dashDirectionY = 0;
-        }
-    }
-
-    if (isDashing && spacePressed && playerDash < MAX_DASH) {
-        playerDash += 5;
-    }
-}
-
-
-void renderPlayer() {
-    SDL_RenderCopy(gRenderer, playerTexture, &playerSpriteRect, &playerRect);
-}
-
-void renderPlayerHealth() {
-    SDL_Rect healthBarRect = { SCREEN_WIDTH - 200, 20, static_cast<int>(100 * (static_cast<float>(playerHealth) / 100)), 20 };
+void renderPlayerHealth(Player player) {
+    SDL_Rect healthBarRect = { SCREEN_WIDTH - 200, 20, static_cast<int>(100 * (static_cast<float>(player.getHealth()) / 100)), 20 };
     SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
     SDL_RenderFillRect(gRenderer, &healthBarRect);
 }
 
-void renderPlayerDash() {
-    SDL_Rect dashBarRect = { SCREEN_WIDTH - 200, 50, static_cast<int>(100 * (static_cast<float>(playerDash) / 100)), 20 };
+void renderPlayerDash(Player player) {
+    SDL_Rect dashBarRect = { SCREEN_WIDTH - 200, 50, static_cast<int>(100 * (static_cast<float>(player.getDash()) / 100)), 20 };
     SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
     SDL_RenderFillRect(gRenderer, &dashBarRect);
 }
