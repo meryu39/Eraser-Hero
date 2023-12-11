@@ -16,18 +16,19 @@ public:
     Player(SDL_Renderer* renderer);
     ~Player();
 
+    SDL_Texture* currentTexture;
     int getHealth() { return health; }
     int getDash() { return dash; }
+    int getX() { return x; }
+    int getY() { return y; }
     void handleInput(std::vector<Enemy>& objectRects);
     void handleCollision(std::vector<Enemy>& objectRects);
     void update(SDL_Renderer* renderer);
-    void render(SDL_Renderer* renderer);
-    void anim();
+    void drawTexture(SDL_Renderer* renderer, SDL_Texture* texture);
+    SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer);
+
 
 private:
-    SDL_Texture* texture;
-    SDL_Rect rect;
-    SDL_Rect spriteRect;
 
     int collidingTo;
     int x;
@@ -44,11 +45,10 @@ private:
     int dashDirectionX;
     int dashDirectionY;
     int dashCollider;
-    int frameIndex;
     int player_state;
-
-    int FRAME_WIDTH; //스프라이트 넓이
-    int NUM_FRAMES; //스프라이트 개수
+    char* walkSpriteSheetPath; //걷기 모션의 경로
+    char* chargeSpriteSheetPath; //돌진 모션의 경로
+    char* currentSpriteSheetPath; //현재 모션 경로
 
     int SCREEN_WIDTH = 1280;
     int SCREEN_HEIGHT = 720;

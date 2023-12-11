@@ -3,35 +3,20 @@
 extern int currentStage;
 
 Player::Player(SDL_Renderer* renderer)
-    : health(100), dash(0), isColliding(false), isDashing(false), dashDirectionX(0), dashDirectionY(0), dashCollider(false), frameIndex(0),
-    FRAME_WIDTH(256), NUM_FRAMES(4) , damage(0), shield(0), speed(0), state(0), x(0), y(0), collidingTo(0), player_state(0), spacePressed(false)
+    : health(100), dash(0), isColliding(false), isDashing(false), dashDirectionX(0), dashDirectionY(0), dashCollider(false),
+    damage(0), shield(0), speed(0), state(0), x(0), y(0), player_state(0), spacePressed(false)
 {
-    // 플레이어 텍스처 로드
-    texture = IMG_LoadTexture(renderer, "player_walk.png");
-    if (texture == nullptr) {
-        std::cerr << "플레이어 텍스처 로드 실패: " << IMG_GetError() << std::endl;
-    }
-
     SCREEN_WIDTH = 1280;
     SCREEN_HEIGHT = 720;
     PLAYER_SIZE = 50;
     OBJECT_SIZE = 30;
     DASH_SPEED = 40;
     MAX_DASH = 100;
-    // 초기 위치 및 크기 설정
-    rect = { SCREEN_WIDTH / 2 - PLAYER_SIZE / 2, SCREEN_HEIGHT / 2 - PLAYER_SIZE / 2, PLAYER_SIZE, PLAYER_SIZE };
-    spriteRect = { 0, 0, 256, 192 };
 }
 
 Player::~Player() 
 {
-    SDL_DestroyTexture(texture);
-}
-
-void Player::anim() 
-{
-    frameIndex = (frameIndex + 1) % NUM_FRAMES;
-    spriteRect.x = frameIndex * FRAME_WIDTH;
+    SDL_DestroyTexture(currentTexture);
 }
 
 void Player::handleInput(std::vector<Enemy>& objectRects) 
@@ -65,19 +50,13 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
             x -= (moveSpeed + speed);
             dashDirectionX = -1;
             dashDirectionY = 0;
-            player_state = 0;
-            anim();
         }
         if (keyboardState[SDL_SCANCODE_RIGHT]) 
         {
             x += (moveSpeed + speed);
             dashDirectionX = 1;
             dashDirectionY = 0;
-            player_state = 1;
-            anim();
-
         }
-        spriteRect.y = 192 * player_state;
     }
 
     SDL_Event e;
@@ -193,7 +172,7 @@ void Player::handleCollision(std::vector<Enemy>& objectRects)
             y < objectRects[i].getY() + objectRects[i].getHeight() &&
             y + PLAYER_SIZE > objectRects[i].getY()) {
 
-            if (!isColliding && isDashing) {
+            if (isColliding && !isDashing) {
                 // 피해 입히는 부분
                 collidingTo = i;
                 health -= (objectRects[i].getDamage() - shield);
@@ -215,23 +194,19 @@ void Player::update(SDL_Renderer* renderer)
     {
         if (state == 0)
         {
-            NUM_FRAMES = 9;
-            texture = IMG_LoadTexture(renderer, "assets\\charge\\Eraser - Sheet.gif");
+            loadTexture((const char* )"assets\\nomalDash.png", renderer);
         }
         else if (state == 1)
         {
-            NUM_FRAMES = 9;
-            texture = IMG_LoadTexture(renderer, "assets\\ruler\\rulerCharge.png");
+            loadTexture((const char*)"assets\\rulerDash.png", renderer);
         }
         else if (state == 2)
         {
-            NUM_FRAMES = 9;
-            texture = IMG_LoadTexture(renderer, "assets\\white\\whiteCharge.png");
+            loadTexture((const char*)"assets\\whiteDash.png", renderer);
         }
         else if (state == 3)
         {
-            NUM_FRAMES = 9;
-            texture = IMG_LoadTexture(renderer, "!assets\\ddak\\ddakCharge.png");
+            loadTexture((const char*)"assets\\ddakDash.png", renderer);
         }
     }
 
@@ -239,33 +214,43 @@ void Player::update(SDL_Renderer* renderer)
     {
         if (state == 0)
         {
-            NUM_FRAMES = 4;
-            texture = IMG_LoadTexture(renderer, "assets\\walk\\Eraser-Sheet.gif");
+            loadTexture((const char*)"assets\\eraser.png", renderer);
         }
         else if (state == 1)
         {
-            NUM_FRAMES = 4;
-            texture = IMG_LoadTexture(renderer, "assets\\ruler\\rulerWalk.png");
+            loadTexture((const char*)"assets\\ruler\\rulerWalk.png", renderer);
         }
         else if (state == 2)
         {
-            NUM_FRAMES = 4;
-            texture = IMG_LoadTexture(renderer, "assets\\white\\whiteCharge.png");
+            loadTexture((const char*)"assets\\white\\whiteCharge.png", renderer);
         }
         else if (state == 3)
         {
-            NUM_FRAMES = 4;
-            texture = IMG_LoadTexture(renderer, "assets\\ddak\\ddakwalk.png");
+            loadTexture((const char*)"assets\\ddak\\ddakwalk.png", renderer);
         }
     }
-    
-    // 애니메이션 프레임 업데이트
-    frameIndex = (frameIndex + 1) % NUM_FRAMES;
-    spriteRect.x = frameIndex * FRAME_WIDTH;
 }
 
-void Player::render(SDL_Renderer* renderer) 
+SDL_Texture*  Player::loadTexture(const char* path, SDL_Renderer* renderer) {
+    SDL_Surface* surface = IMG_Load(path);
+    if (!surface) {
+        cerr << "이미지를 로드하는데 실패했습니다: " << IMG_GetError() << endl;
+        return nullptr;
+    }
+    currentTexture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    return currentTexture;
+}
+
+void Player::drawTexture(SDL_Renderer* renderer, SDL_Texture* texture)
 {
-    // 플레이어 렌더링
-    SDL_RenderCopy(renderer, texture, &spriteRect, &rect);
+    SDL_Rect src, dst;
+    src.x = src.y = 0;
+    dst.x = x;
+    dst.y = y;
+    SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
+    dst.w = src.w;
+    dst.h = src.h;
+    SDL_RenderCopy(renderer, texture, &src, &dst);
 }

@@ -3,7 +3,8 @@
 
 Enemy::Enemy()
 {
-	currentFrame = 0; 
+	width = 256;
+	height = 192;
 	directionX = 0;
 	directionY = 1;
 	isCharging = false;
@@ -11,8 +12,7 @@ Enemy::Enemy()
 
 Enemy::~Enemy() 
 {
-	SDL_DestroyTexture(walkTexture);
-	SDL_DestroyTexture(chargeTexture);
+	SDL_DestroyTexture(currentTexture);
 }
 
 void Enemy::charge(int targetX, int targetY)
@@ -37,22 +37,18 @@ void Enemy::charge(int targetX, int targetY)
 		}
 }
 
-void Enemy::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
+void Enemy::update(Uint32 lastUpdateTime, Uint32 updateInterval, SDL_Renderer* renderer) {
 	Uint32 currentTime = SDL_GetTicks();
-	if (isCharging)
-	{
-		columns = 1;
-		rows = 9;
-	}
+	currentSpriteSheetPath = isCharging ? chargeSpriteSheetPath : walkSpriteSheetPath;
+	loadTexture(currentSpriteSheetPath, renderer);
 	if (currentTime - lastUpdateTime >= updateInterval) {
 		lastUpdateTime = currentTime;
 
-		directionX = rand() % 3 - 1;
-		directionY = rand() % 3 - 1;
+		directionX = rand() % 2;
+		directionY = rand() % 2;
 
-		isCharging = rand() % 2 == 0;
+		isCharging = (rand() % 2 == 0);
 	}
-
 	x += directionX;
 	y += directionY;
 
@@ -73,19 +69,18 @@ void Enemy::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
 		y = SCREEN_HEIGHT - 50;
 		directionY *= -1;
 	}
-
-	currentFrame = (currentFrame + 1) % (rows * columns);
 }
 
-void Enemy::render(SDL_Renderer* renderer) {
-	int frameWidth = SCREEN_WIDTH / rows;
-	int frameHeight = SCREEN_HEIGHT / columns;
-
-	SDL_Rect srcRect = { (currentFrame % rows) * frameWidth, (currentFrame / columns) * frameHeight, frameWidth, frameHeight };
-	SDL_Rect destRect = { x, y, frameWidth, frameHeight };
-
-	SDL_Texture* currentTexture = isCharging ? chargeTexture : walkTexture;
-	SDL_RenderCopy(renderer, currentTexture, &srcRect, &destRect);
+void Enemy::drawTexture(SDL_Renderer* renderer, SDL_Texture* texture) 
+{
+	SDL_Rect src, dst;
+	src.x = src.y = 0;
+	dst.x = x;
+	dst.y = y; 
+	SDL_QueryTexture(texture, NULL, NULL, &src.w, &src.h);
+	dst.w = src.w; 
+	dst.h = src.h; 
+	SDL_RenderCopy(renderer, texture, &src, &dst); 
 }
 
 SDL_Texture* Enemy::loadTexture(const char* path, SDL_Renderer* renderer) {
@@ -94,57 +89,44 @@ SDL_Texture* Enemy::loadTexture(const char* path, SDL_Renderer* renderer) {
 		cerr << "이미지를 로드하는데 실패했습니다: " << IMG_GetError() << endl;
 		return nullptr;
 	}
-
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	currentTexture = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 
-	return texture;
+	return currentTexture;
 }
 
 Pencil::Pencil(SDL_Renderer* renderer, int spwanX, int spwanY)
 {
-	walkSpriteSheetPath = (char*)"assets\\walk\\Pencil-Sheet.gif";
-	chargeSpriteSheetPath = (char*)"assets\\charge\\Pencil-Sheet.gif";
+	walkSpriteSheetPath = (char*)"assets\\pencil.png";
+	chargeSpriteSheetPath = (char*)"assets\\pencil.png";
 	x = spwanX;
 	y = spwanY;
-	columns = 1;
-	rows = 4;
 	resistance = 0;
 	damage = 10;
 	speed = 10;
-	walkTexture = loadTexture(walkSpriteSheetPath, renderer);
-	chargeTexture = loadTexture(chargeSpriteSheetPath, renderer);
 }
 
 
 Sharp::Sharp(SDL_Renderer* renderer, int spwanX, int spwanY)
 {
-	walkSpriteSheetPath = (char*)"assets\\walk\\Sharp_pen-Sheet.gif";
-	chargeSpriteSheetPath = (char*)"assets\\charge\\Sharp_pen_2-Sheet.gif";
+	walkSpriteSheetPath = (char*)"assets\\sharp.png";
+	chargeSpriteSheetPath = (char*)"assets\\sharp.png";
 	x = spwanX;
 	y = spwanY;
-	columns = 1;
-	rows = 4;
 	resistance = 2;
 	damage = 15;
 	speed = 15;
-	walkTexture = loadTexture(walkSpriteSheetPath, renderer);
-	chargeTexture = loadTexture(chargeSpriteSheetPath, renderer);
 }
 
 Fountain::Fountain(SDL_Renderer* renderer, int spwanX, int spwanY)
 {
-	walkSpriteSheetPath = (char*)"assets\\walk\\Fountain_pen-Sheet.gif";
-	chargeSpriteSheetPath = (char*)"assets\\charge\\Fountain_pen-Sheet.gif";
+	walkSpriteSheetPath = (char*)"assets\\fountain.png";
+	chargeSpriteSheetPath = (char*)"assets\\fountain.png";
 	x = spwanX;
 	y = spwanY;
-	columns = 1;
-	rows = 4;
 	resistance = 0;
 	damage = 10;
 	speed = 10;
-	walkTexture = loadTexture(walkSpriteSheetPath, renderer);
-	chargeTexture = loadTexture(chargeSpriteSheetPath, renderer);
 	loadTrailTexture(renderer);
 	trailLastTime = 5;
 	trailUpdateTime = 1;
@@ -179,10 +161,10 @@ void Fountain::charge(int targetX, int targetY)
 	updateTrail();
 }
 
-void Fountain::render(SDL_Renderer* renderer) 
+void Fountain::drawTexture(SDL_Renderer* renderer, SDL_Texture* texture) 
 {
-	// 기본 클래스의 render 함수 호출
-	Enemy::render(renderer);
+	// 기본 클래스의 draw 함수 호출
+	Enemy::drawTexture(renderer, texture);
 
 	// 현재 시간
 	Uint32 currentTime = SDL_GetTicks();
@@ -199,7 +181,7 @@ void Fountain::render(SDL_Renderer* renderer)
 		}
 		else 
 		{
-			SDL_RenderCopy(renderer, trailTexture, nullptr, &trailRect);
+			drawTexture(renderer, trailTexture);
 			++it;
 		}
 	}
@@ -207,17 +189,13 @@ void Fountain::render(SDL_Renderer* renderer)
 
 Compass::Compass(SDL_Renderer* renderer, int spwanX, int spwanY)
 {
-	walkSpriteSheetPath = (char*)"assets\\walk\\Compas_no_Sheet-Sheet.gif";
-	chargeSpriteSheetPath = (char*)"assets\\charge\\Compas-Sheet.gif";
+	walkSpriteSheetPath = (char*)"assets\\compass.png";
+	chargeSpriteSheetPath = (char*)"assets\\compass.png";
 	x = spwanX;
 	y = spwanY;
-	columns = 1;
-	rows = 6;
 	resistance = 4;
 	damage = 20;
 	speed = 15;
-	walkTexture = loadTexture(walkSpriteSheetPath, renderer);
-	chargeTexture = loadTexture(chargeSpriteSheetPath, renderer);
 }
 
 void Compass::charge(Uint32 currentTime, Uint32 chargeStartTime, Uint32 chargeDuration)
@@ -282,12 +260,8 @@ void Compass::update(Uint32 lastUpdateTime, Uint32 updateInterval) {
 		directionY *= -1;
 	}
 
-	currentFrame = (currentFrame + 1) % (rows * columns);
-
 	// 돌진 로직 추가
 	if (isCharging) {
-		columns = 1;
-		rows = 10;
 		charge(currentTime, chargeStartTime, chargeDuration);
 	}
 }

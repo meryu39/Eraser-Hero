@@ -11,7 +11,6 @@ SDL_Texture* playerTexture = nullptr;
 
 const int OBJECT_SIZE = 30;
 
-SDL_Rect objectRect = { SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, OBJECT_SIZE, OBJECT_SIZE };
 // 함수 선언
 
 int current = 0;
@@ -26,7 +25,7 @@ int player_state;
 Uint32 startTime = 0;
 Uint32 elapsedTime = 0;
 Uint32 lastUpdateTime = 0; // 초기값 설정
-Uint32 updateInterval = 10000; // 예: 1000 밀리초마다 업데이트
+Uint32 updateInterval = 1000; // 1000 밀리초마다 업데이트
 
 //1분
 const Uint32 MAX_TIME = 60000;  
@@ -46,7 +45,8 @@ int main(int argc, char* args[]) {
     while (true) {
 
         Uint32 frameStart = SDL_GetTicks();
-
+        SDL_RenderClear(gRenderer);
+        SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
         //objects == enemy의 벡터 배열
         player.handleInput(enemys);
 
@@ -56,15 +56,16 @@ int main(int argc, char* args[]) {
         player.update(gRenderer);
 
         // 플레이어 렌더링
-        player.render(gRenderer);
-
-        //그래픽 렌더링
-        SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+        player.drawTexture(gRenderer, player.currentTexture);
 
         for (int i = 0; i < enemys.size(); i++)
         {
-            enemys[i].update(lastUpdateTime, updateInterval);
-            enemys[i].render(gRenderer);
+            enemys[i].update(lastUpdateTime, updateInterval, gRenderer);
+            enemys[i].drawTexture(gRenderer, enemys[i].currentTexture);
+            if (enemys[i].getIsCharging())
+            {
+                enemys[i].charge(player.getX(), player.getY());
+            }
         }
 
         elapsedTime = SDL_GetTicks() - startTime;
@@ -74,12 +75,9 @@ int main(int argc, char* args[]) {
         SDL_SetRenderDrawColor(gRenderer, 0, 0, 255, 255);
         SDL_RenderFillRect(gRenderer, &timerRect);
 
-        SDL_SetRenderDrawColor(gRenderer, 255, 0, 0, 255);
-        SDL_RenderFillRect(gRenderer, &objectRect);
-
         renderPlayerHealth(player);
         renderPlayerDash(player);
-        
+ 
         SDL_RenderPresent(gRenderer);
         //시간 지남 
         if (elapsedTime >= MAX_TIME) {

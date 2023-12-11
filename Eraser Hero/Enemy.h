@@ -22,15 +22,17 @@ public:
 	int getY() { return y; }
 	int getWidth() { return width; }
 	int getHeight() { return height; }
+	bool getIsCharging(){ return isCharging; }
 
 	void setDamage(int newDamage) { damage = newDamage; }
 	void setSpeed(int newSpeed) { speed = newSpeed; }
 	void setX(int newX) { x = newX; }
 	void setY(int newY) { y = newY; }
 
+	SDL_Texture* currentTexture;
 	void charge(int targetX, int targetY);
-	void update(Uint32 lastUpdateTime, Uint32 updateInterval);
-	void render(SDL_Renderer* renderer);
+	void update(Uint32 lastUpdateTime, Uint32 updateInterval, SDL_Renderer* renderer);
+	void drawTexture(SDL_Renderer* renderer, SDL_Texture* texture);
 protected:
 	int resistance; //적 유형에 따른 밀림저항
 	int damage; //적이 플레이어에게 공격했을때 주는 데미지값
@@ -38,12 +40,9 @@ protected:
 	int x, y; //좌표
 	int directionX, directionY; // 이동할 방향
 	int width, height;  // 테두리의 폭과 높이
-	int rows, columns; //스프라이트의 행, 열
-	int currentFrame; //현재 프레임
-	SDL_Texture* walkTexture; //걷기 모션
-	SDL_Texture* chargeTexture; //돌진 모션
 	char* walkSpriteSheetPath; //걷기 모션의 경로
 	char* chargeSpriteSheetPath; //돌진 모션의 경로
+	char* currentSpriteSheetPath; //현재 모션 경로
 	bool isCharging; //돌진하고 있는지
 
 	SDL_Texture* loadTexture(const char* path, SDL_Renderer* renderer);
@@ -73,7 +72,7 @@ public:
 	void loadTrailTexture(SDL_Renderer* renderer); // 자국 이미지를 로드하는 함수
 	void updateTrail(); // 자국을 업데이트하는 함수 추가
 	void charge(int targetX, int targetY); // 돌진 함수를 오버라이드하여 자국 업데이트 포함
-	void render(SDL_Renderer* renderer);  // 렌더 함수를 오버라이드하여 자국도 렌더링
+	void drawTexture(SDL_Renderer* renderer, SDL_Texture* texture);  // 드로우 함수를 오버라이드하여 자국도 렌더링
 
 private:
 	//만년필 잉크자국의 좌표
