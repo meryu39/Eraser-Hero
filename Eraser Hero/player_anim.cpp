@@ -177,8 +177,7 @@ int main(int argc, char* args[]) {
        
         Uint32 frameStart = SDL_GetTicks();
         SDL_RenderClear(gRenderer);
-        SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-        //objects == enemy의 벡터 배열
+        renderStageImage("map.png");        
         player.handleInput(enemys);
 
         player.handleCollision(enemys);
@@ -321,14 +320,37 @@ void renderStageImage(const char* imagePath) {
     SDL_FreeSurface(surface);
 
     // Render the image to the window
-    SDL_RenderClear(gRenderer);
     SDL_RenderCopy(gRenderer, texture, NULL, NULL);
     SDL_RenderPresent(gRenderer);
 
     // Free the texture
     SDL_DestroyTexture(texture);
 }
+/*
+void renderStageImage(const char* imagePath) {
+    SDL_Surface* surface = IMG_Load(imagePath);
+    if (surface == NULL) {
+        printf("이미지를 불러올 수 없습니다. SDL_image 에러: %s\n", IMG_GetError());
+        return;
+    }
 
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, surface);
+    if (texture == NULL) {
+        printf("텍스처를 생성할 수 없습니다. SDL 에러: %s\n", SDL_GetError());
+        SDL_FreeSurface(surface);
+        return;
+    }
+
+    SDL_FreeSurface(surface);
+
+    // Render the image to the window
+    SDL_RenderClear(gRenderer);
+    SDL_RenderCopy(gRenderer, texture, NULL, NULL);
+    SDL_RenderPresent(gRenderer);
+
+    // Free the texture
+    SDL_DestroyTexture(texture);
+}*/
 void conversation() {
     int currentImageIndex = 0;  
     SDL_Event e;
