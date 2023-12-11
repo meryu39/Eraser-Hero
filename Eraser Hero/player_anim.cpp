@@ -14,8 +14,10 @@ const int OBJECT_SIZE = 30;
 // 함수 선언
 
 int current = 0;
-int currentStage = 0;
+int current_Stage = 0;
+
 bool story_start = true;
+
 bool initSDL();
 void closeSDL();
 void renderPlayerHealth(Player player);
@@ -24,6 +26,63 @@ void renderPlayerDash(Player player);
 
 int player_state;
 
+const char* stage0[] = {
+    "story\\1_0.png",
+    "story\\1_1.png",
+    "story\\1_2.png",
+    "story\\1_3.png",
+    "story\\1_4.png",
+    "story\\1_5.png",
+    "story\\1_6.png",
+    "story\\1_7.png",
+    "story\\2_1.png",
+    "story\\2_2.png"
+};
+
+const char* stage1[] = {
+    "story\\3_1.png",
+    "story\\3_2.png",
+    "story\\3_3.png",
+    "story\\3_4.png",
+    "story\\4_1.png"
+};
+
+const char* stage2[] = {
+    "story\\5_1.png",
+    "story\\5_2.png",
+    "story\\5_3.png",
+    "story\\5_4.png",
+    "story\\5_5.png"
+};
+
+const char* stage3[] = {
+    "story\\6_1.png",
+    "story\\6_2.png",
+    "story\\6_3.png"
+    "story\\7_1.png",
+    "story\\7_2.png",
+    "story\\7_3.png",
+    "story\\7_4.png"
+};
+
+const char* stage4[] = {
+    "story\\8_1.png",
+    "story\\8_2.png",
+    "story\\8_3.png",
+    "story\\8_4.png",
+    "story\\8_5.png",
+    "story\\8_6.png",
+    "story\\8_7.png",
+    "story\\8_8.png",
+    "story\\8_9.png",
+    "story\\8_10.png",
+    "story\\8_11.png",
+    "story\\8_12.png",
+    "story\\8_13.png",
+    "story\\8_14.png"
+
+};
+
 Uint32 startTime = 0;
 Uint32 elapsedTime = 0;
 Uint32 lastUpdateTime = 0; // 초기값 설정
@@ -31,11 +90,14 @@ Uint32 updateInterval = 1000; // 1000 밀리초마다 업데이트
 
 //1분
 const Uint32 MAX_TIME = 60000;  
-
+void renderStageImage(const char* imagePath);
+void conversation();
 int main(int argc, char* args[]) {
     if (!initSDL()) {
         return -1;
     }
+
+
     srand(time(0));
     Player player(gRenderer);
     vector<Enemy> enemys;
@@ -47,7 +109,11 @@ int main(int argc, char* args[]) {
     while (true) {
         if (enemys.empty())
         {
-            
+            current_Stage++;
+            story_start = true;
+        }
+        if (story_start) {
+            conversation();
         }
 
         Uint32 frameStart = SDL_GetTicks();
@@ -178,3 +244,87 @@ void renderPlayerDash(Player player) {
     SDL_SetRenderDrawColor(gRenderer, 0, 255, 0, 255);
     SDL_RenderFillRect(gRenderer, &dashBarRect);
 }
+
+void renderStageImage(const char* imagePath) {
+    SDL_Surface* surface = IMG_Load(imagePath);
+    if (surface == NULL) {
+        printf("이미지를 불러올 수 없습니다. SDL_image 에러: %s\n", IMG_GetError());
+        return;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(gRenderer, surface);
+    if (texture == NULL) {
+        printf("텍스처를 생성할 수 없습니다. SDL 에러: %s\n", SDL_GetError());
+        SDL_FreeSurface(surface);
+        return;
+    }
+
+    SDL_FreeSurface(surface);
+
+    // Render the image to the window
+    SDL_RenderClear(gRenderer);
+    SDL_RenderCopy(gRenderer, texture, NULL, NULL);
+    SDL_RenderPresent(gRenderer);
+
+    // Free the texture
+    SDL_DestroyTexture(texture);
+}
+
+void conversation() {
+    int currentImageIndex = 0;  
+    SDL_Event e;
+    int quit = 0;
+
+    while (1) {
+        const char** currentStage = nullptr;
+        int totalImages = 0;
+        int turn = 0;
+
+        if (current_Stage == 0) {
+            currentStage = stage0;
+            totalImages = sizeof(stage0) / sizeof(stage0[0]);
+
+        }
+        else if (current_Stage == 1) {
+            currentStage = stage1;
+            totalImages = sizeof(stage1) / sizeof(stage1[0]);
+        }
+        else if (current_Stage == 2) {
+            currentStage = stage2;
+            totalImages = sizeof(stage2) / sizeof(stage2[0]);
+        }
+        else if (current_Stage == 3) {
+            currentStage = stage3;
+            totalImages = sizeof(stage3) / sizeof(stage3[0]);
+        }
+        else if(current_Stage == 4){
+            currentStage = stage4;
+            totalImages = sizeof(stage4) / sizeof(stage4[0]);
+        }
+    
+       
+    
+        renderStageImage(currentStage[currentImageIndex]);
+        SDL_RenderPresent(gRenderer);
+
+        while (SDL_PollEvent(&e) != 0) {
+   
+            if (e.type == SDL_QUIT) {
+                quit = 1;
+            }
+ 
+            else if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_SPACE) {
+        
+                    currentImageIndex++;
+
+                    if (currentImageIndex >= totalImages) {
+                        story_start = false;  
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
