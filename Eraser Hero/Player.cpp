@@ -1,6 +1,6 @@
 #include "Player.h"
 
-extern int currentStage;
+extern int current_Stage;
 
 Player::Player(SDL_Renderer* renderer)
     : health(1000), dash(0), isColliding(false), isDashing(false), dashDirectionX(0), dashDirectionY(0), dashCollider(false),
@@ -81,7 +81,7 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
                 break;
             //자
             case SDLK_a:
-                if (currentStage >= 2)
+                if (current_Stage == 2)
                 {
                     state = 1;
                     shield = 0;
@@ -91,7 +91,7 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
                 break;
             //화이트
             case SDLK_s:
-                if (currentStage >= 3)
+                if (current_Stage == 3)
                 {
                     state = 2;
                     shield = 0;
@@ -101,7 +101,7 @@ void Player::handleInput(std::vector<Enemy>& objectRects)
                 break;
             //딱풀
             case SDLK_d:
-                if (currentStage >= 4)
+                if (current_Stage >= 4)
                 {
                     state = 3;
                     shield = 5;

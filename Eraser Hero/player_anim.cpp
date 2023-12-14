@@ -4,6 +4,15 @@
 #include <SDL_timer.h>
 #include "Player.h"
 
+/*
+#include <Windows.h>
+#include <conio.h>
+#include <mmsystem.h>
+#pragma comment(lib,"winmm.lib")
+*/
+
+
+
 // 전역 변수
 SDL_Window* gWindow = nullptr;
 SDL_Renderer* gRenderer = nullptr;
@@ -119,6 +128,7 @@ int main(int argc, char* args[]) {
     //enemys.push_back(sharp);
 
     while (true) {
+        //PlaySound(L"backsound.wav", 0, SND_FILENAME | SND_ASYNC | SND_LOOP);
         if (enemys.empty())
         {
             current_Stage++;
@@ -138,8 +148,9 @@ int main(int argc, char* args[]) {
                 enemys.push_back(Sharp2);
                 Sharp Sharp3(gRenderer, 400, 600);
                 enemys.push_back(Sharp3);
-                Sharp Sharp4(gRenderer, 800, 210);
+                Sharp Sharp4(gRenderer, 700, 600);
                 enemys.push_back(Sharp4);
+
                 mv_stage = 1;
                 
             }
@@ -155,8 +166,9 @@ int main(int argc, char* args[]) {
                     enemys.push_back(Fountain2);
                     Fountain Fountain3(gRenderer, 400, 600);
                     enemys.push_back(Fountain3);
-                    Fountain Fountain4(gRenderer, 800, 210);
-                    enemys.push_back(Fountain4);
+                    Fountain Fountain4(gRenderer, 400, 600);
+                    enemys.push_back(Fountain3);
+
                     mv_stage = 2;
                 }
             }

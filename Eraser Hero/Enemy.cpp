@@ -128,7 +128,7 @@ Fountain::Fountain(SDL_Renderer* renderer, int spwanX, int spwanY)
 	x = spwanX;
 	y = spwanY;
 	resistance = 0;
-	damage = 10;
+	damage = 5;
 	speed = 10;
 	loadTrailTexture(renderer);
 	trailLastTime = 5;
@@ -197,8 +197,8 @@ Compass::Compass(SDL_Renderer* renderer, int spwanX, int spwanY)
 	x = spwanX;
 	y = spwanY;
 	resistance = 4;
-	damage = 20;
-	speed = 15;
+	damage = 10;
+	speed = 12;
 }
 
 void Compass::charge(Uint32 currentTime, Uint32 chargeStartTime, Uint32 chargeDuration)
